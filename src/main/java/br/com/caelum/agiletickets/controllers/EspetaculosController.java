@@ -118,6 +118,7 @@ public class EspetaculosController {
 
 		result.include("message", sessoes.size() + " sessoes criadas com sucesso");
 		result.redirectTo(this).lista();
+		
 	}
 
 	private Espetaculo carregaEspetaculo(Long espetaculoId) {

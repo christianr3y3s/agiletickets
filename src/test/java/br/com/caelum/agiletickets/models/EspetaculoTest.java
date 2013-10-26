@@ -1,8 +1,14 @@
 package br.com.caelum.agiletickets.models;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
+
+import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
+import org.joda.time.LocalTime;
 import org.junit.Test;
 
 public class EspetaculoTest {
@@ -80,4 +86,65 @@ public class EspetaculoTest {
 
 		return sessao;
 	}
+	
+	@Test
+	public void ehPossivelCriarSessao() {
+		LocalDate inicio = new LocalDate(2013,10,28); 
+		LocalDate fim = new LocalDate(2013,10,28); 
+		LocalTime horario =new LocalTime(12,00,00);
+		Periodicidade periodicidade = Periodicidade.DIARIA;
+		
+		Espetaculo espetaculo = new Espetaculo();
+		List<Sessao> sessoes = espetaculo.criaSessoes(inicio, fim, horario, periodicidade);
+		Sessao sessao = sessoes.get(0);
+		
+		assertEquals(1 ,sessoes.size());
+		assertEquals( "28/10/13", sessao.getDia() );
+		assertEquals( "12:00", sessao.getHora() );
+	}
+	
+	@Test
+	public void ehPossivelDuasSessoes() {
+		LocalDate inicio = new LocalDate(2013,10,1); 
+		LocalDate fim = new LocalDate(2013,10,3); 
+		LocalTime horario =new LocalTime(12,00,00);
+		Periodicidade periodicidade = Periodicidade.DIARIA;
+		
+		Espetaculo espetaculo = new Espetaculo();
+		List<Sessao> sessoes = espetaculo.criaSessoes(inicio, fim, horario, periodicidade);
+		
+		assertEquals(2 ,sessoes.size());
+		Sessao sessao = sessoes.get(0);
+		
+		assertEquals( "01/10/13", sessao.getDia() );
+		assertEquals( "12:00", sessao.getHora() );
+		
+		Sessao sessao1 = sessoes.get(1);
+		assertEquals( "03/10/13", sessao1.getDia() );
+		assertEquals( "12:00", sessao1.getHora() );
+	}
+	
+	@Test
+	public void ehPossivelSessoesSemanais() {
+		LocalDate inicio = new LocalDate(2013,10,1); 
+		LocalDate fim = new LocalDate(2013,10,8); 
+		LocalTime horario =new LocalTime(12,00,00);
+		Periodicidade periodicidade = Periodicidade.SEMANAL;
+		
+		Espetaculo espetaculo = new Espetaculo();
+		List<Sessao> sessoes = espetaculo.criaSessoes(inicio, fim, horario, periodicidade);
+		
+		assertEquals(2 ,sessoes.size());
+		Sessao sessao = sessoes.get(0);
+		
+		assertEquals( "01/10/13", sessao.getDia() );
+		assertEquals( "12:00", sessao.getHora() );
+		
+		Sessao sessao1 = sessoes.get(1);
+		assertEquals( "08/10/13", sessao1.getDia() );
+		assertEquals( "12:00", sessao1.getHora() );
+	}
+	
+	
+
 }
