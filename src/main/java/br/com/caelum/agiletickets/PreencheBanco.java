@@ -20,34 +20,59 @@ public class PreencheBanco {
 		EntityManagerCreator managerCreator = new EntityManagerCreator(creator.getInstance());
 		managerCreator.create();
 		EntityManager manager = managerCreator.getInstance();
-
 		manager.getTransaction().begin();
-		manager.createQuery("delete from Sessao").executeUpdate();
-		manager.createQuery("delete from Espetaculo").executeUpdate();
-		manager.createQuery("delete from Estabelecimento").executeUpdate();
-		Estabelecimento estabelecimento = new Estabelecimento();
-		estabelecimento.setNome("Casa de shows");
-		estabelecimento.setEndereco("Rua dos Silveiras, 12345");
+		
+		
+		deleteTables(manager);
+		
+		Estabelecimento estabelecimento = getEstabelecimento();
+		Espetaculo espetaculo = getEspetaculo(estabelecimento);
 
-		Espetaculo espetaculo = new Espetaculo();
-		espetaculo.setEstabelecimento(estabelecimento);
-		espetaculo.setNome("Depeche Mode");
-		espetaculo.setTipo(TipoDeEspetaculo.SHOW);
+		persiste(manager, estabelecimento, espetaculo);
 
-		manager.persist(estabelecimento);
-		manager.persist(espetaculo);
-
-		for (int i = 0; i < 10; i++) {
-			Sessao sessao = new Sessao();
-			sessao.setEspetaculo(espetaculo);
-			sessao.setInicio(new DateTime().plusDays(7+i));
-			sessao.setDuracaoEmMinutos(60 * 3);
-			sessao.setTotalIngressos(10);
-			sessao.setIngressosReservados(10 - i);
-			manager.persist(sessao);
+		for (int cii = 0; cii < 10; cii++) {
+			Sessao sessao = createSessao(espetaculo, cii);
+			persiste(manager, sessao);
 		}
 
 		manager.getTransaction().commit();
 		manager.close();
+	}
+	
+	private static void persiste(EntityManager em, Object...objects ){
+		for (Object object : objects) {
+			em.persist(object);
+		}
+	}
+
+	private static Sessao createSessao(Espetaculo espetaculo, int cii) {
+		Sessao sessao = new Sessao();
+		sessao.setEspetaculo(espetaculo);
+		sessao.setInicio(new DateTime().plusDays(7+cii));
+		sessao.setDuracaoEmMinutos(60 * 3);
+		sessao.setTotalIngressos(10);
+		sessao.setIngressosReservados(10 - cii);
+		return sessao;
+	}
+
+	private static Espetaculo getEspetaculo(Estabelecimento estabelecimento) {
+		Espetaculo espetaculo = new Espetaculo();
+		espetaculo.setEstabelecimento(estabelecimento);
+		espetaculo.setNome("Depeche Mode");
+		espetaculo.setTipo(TipoDeEspetaculo.SHOW);
+		return espetaculo;
+	}
+
+	private static Estabelecimento getEstabelecimento() {
+		Estabelecimento estabelecimento = new Estabelecimento();
+		estabelecimento.setNome("Casa de shows");
+		estabelecimento.setEndereco("Rua dos Silveiras, 12345");
+		return estabelecimento;
+	}
+
+	private static void deleteTables(EntityManager manager) {
+		manager.createQuery("delete from Sessao").executeUpdate();
+		manager.createQuery("delete from Espetaculo").executeUpdate();
+		manager.createQuery("delete from Estabelecimento").executeUpdate();
 	}
 }
